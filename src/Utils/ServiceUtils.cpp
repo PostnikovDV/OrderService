@@ -46,16 +46,16 @@ namespace ServiceUtils
         std::string result(base);
 
 #ifdef BOOST_MSVC
-        char constexpr path_separator = '\\';
-        if (result.back() == path_separator)
+        char constexpr pathSeparator = '\\';
+        if (result.back() == pathSeparator)
             result.resize(result.size() - 1);
         result.append(path.data(), path.size());
         for (auto& c : result)
             if (c == '/')
-                c = path_separator;
+                c = pathSeparator;
 #else
-        char constexpr path_separator = '/';
-        if (result.back() == path_separator)
+        char constexpr pathSeparator = '/';
+        if (result.back() == pathSeparator)
             result.resize(result.size() - 1);
         result.append(path.data(), path.size());
 #endif

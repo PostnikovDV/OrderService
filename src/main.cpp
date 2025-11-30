@@ -17,26 +17,24 @@ int main(int argc, char* argv[])
     auto const threads = std::max<int>(1, std::thread::hardware_concurrency());
     auto const address = net::ip::make_address("127.0.0.1");
     auto const port = static_cast<unsigned short>(8181);
-    std::filesystem::path exe_path = std::filesystem::current_path();
-    std::filesystem::path doc_root_path = exe_path / "www";
+    std::filesystem::path exePath = std::filesystem::current_path();
+    std::filesystem::path docRootPath = exePath / "www";
 
-    auto const doc_root = std::make_shared<std::string>(doc_root_path.string());
+    auto const docRoot = std::make_shared<std::string>(docRootPath.string());
 
     std::cout << "Server starting on " << address << ":" << port << " with " << threads << " threads." << std::endl;
 
     net::io_context ioc{ threads };
 
-    std::make_shared<HttpListener>(ioc, tcp::endpoint{ address, port }, doc_root)->run();
+    std::make_shared<HttpListener>(ioc, tcp::endpoint{ address, port }, docRoot)->run();
 
-    // «апускаем пулы потоков дл€ io_context
     std::vector<std::thread> v;
     v.reserve(threads - 1);
     for (auto i = threads - 1; i > 0; --i)
         v.emplace_back([&ioc] { ioc.run(); });
 
-    ioc.run(); // √лавный поток тоже работает
+    ioc.run();
 
-    // ƒождемс€ завершени€ всех потоков (это никогда не произойдет, пока ioc.run() активен)
     for (auto& t : v)
         t.join();
 
