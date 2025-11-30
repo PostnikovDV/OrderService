@@ -66,7 +66,7 @@ namespace ServiceUtils
             return res;
         };
 
-        std::shared_ptr<OrderService> orderService = std::make_shared<OrderService>(dbManager->GetConnectionString());
+        std::shared_ptr<OrderService> orderService = std::make_shared<OrderService>(ServiceUtils::GetConnectionStringFromEnv());
 
         if (req.method() != http::verb::get &&
             req.method() != http::verb::head &&

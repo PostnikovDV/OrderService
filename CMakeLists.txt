@@ -15,8 +15,6 @@ endif()
 
 set(SOURCE_FILES
     src/main.cpp
-    src/DbManager.h
-    src/DbManager.cpp
     src/Orders/OrderService.cpp
     src/Orders/OrderService.h
     src/Utils/ServiceUtils.h
@@ -39,11 +37,6 @@ add_executable(my_OrderService ${SOURCE_FILES})
 
 source_group("Main" FILES
     src/main.cpp
-)
-
-source_group("DataBase" FILES
-    src/DbManager.h
-    src/DbManager.cpp
 )
 
 source_group("Orders" FILES
