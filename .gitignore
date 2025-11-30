@@ -1,0 +1,11 @@
+# Build directories
+build/
+*/build/
+out/
+bin/
+obj/
+target/
+dist/
+
+
+.vs/
