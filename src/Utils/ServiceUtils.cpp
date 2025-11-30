@@ -133,5 +133,36 @@ namespace ServiceUtils
         std::regex pattern(R"(^[\d\s\-\+\(\)]{10,20}$)");
         return std::regex_match(phone, pattern);
     }
+
+    std::string GetConnectionStringFromEnv()
+    {
+        const char* fullConnectionString = std::getenv("DB_FULL_CONNECTION_STRING");
+        if (fullConnectionString)
+        {
+            return std::string(fullConnectionString);
+        }
+        return LoadEnvFile();
+    }
+
+
+    std::string LoadEnvFile()
+    {
+        std::ifstream file(std::filesystem::current_path() / ".." / ".env");
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Cannot open .env file");
+        }
+
+        std::string line;
+        while (std::getline(file, line))
+        {
+            if (line.find("DB_FULL_CONNECTION_STRING=") == 0)
+            {
+                return line.substr(26);
+            }
+        }
+
+        throw std::runtime_error("DB_FULL_CONNECTION_STRING not found in .env file");
+    }
     
 } //ServiceUtils

@@ -9,3 +9,11 @@ dist/
 
 
 .vs/
+
+
+
+# Environment variables
+.env
+*.env
+.env.*
+!.env.examp

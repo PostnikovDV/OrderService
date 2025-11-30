@@ -15,19 +15,12 @@ using tcp = boost::asio::ip::tcp;
 
 static std::unique_ptr<DatabaseManager> dbManager;
 
-
-
 int main(int argc, char* argv[])
 {
 
-    std::string db_connection_string =
-        "host=localhost "
-        "port=5432 "
-        "dbname=orderservice "
-        "user=postgres "
-        "password=postgres";
+    std::string dbConnectionString = ServiceUtils::GetConnectionStringFromEnv();
 
-    dbManager = std::make_unique<DatabaseManager>(db_connection_string);
+    dbManager = std::make_unique<DatabaseManager>(dbConnectionString);
     auto const threads = std::max<int>(1, std::thread::hardware_concurrency());
     auto const address = net::ip::make_address("127.0.0.1");
     auto const port = static_cast<unsigned short>(8181);

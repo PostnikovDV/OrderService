@@ -1,4 +1,7 @@
 #pragma once
+#include <cstdlib>
+#include <fstream>
+#include <sstream>
 #include "../Orders/OrderService.h"
 
 
@@ -172,4 +175,11 @@ namespace ServiceUtils
         }
         return not_found(std::string(req.target()));
     }
-}
+
+
+    std::string GetConnectionStringFromEnv();
+
+
+    std::string LoadEnvFile();
+
+}    //ServiceUtils
