@@ -70,9 +70,6 @@ source_group("PCH" FILES ${PCH_HEADER})
 
 target_precompile_headers(my_OrderService PRIVATE ${PCH_HEADER})
 
-find_package(httplib CONFIG REQUIRED)
-
-
 find_package(Boost CONFIG REQUIRED COMPONENTS system asio beast)
 
 
@@ -169,6 +166,5 @@ target_link_libraries(my_OrderService PRIVATE
     Boost::asio
     Boost::beast
     libpqxx::pqxx
-    httplib::httplib
     nlohmann_json::nlohmann_json
 )
