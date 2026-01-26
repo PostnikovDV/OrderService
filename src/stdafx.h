@@ -23,8 +23,5 @@
 // libpqxx
 #include <pqxx/pqxx>
 
-// httplib
-#include <httplib.h>
-
 //nlohmann
 #include <nlohmann/json.hpp>

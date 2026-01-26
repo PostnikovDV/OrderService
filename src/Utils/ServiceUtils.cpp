@@ -1,3 +1,5 @@
+#include <fstream>
+#include <sstream>
 #include "ServiceUtils.h"
 
 namespace ServiceUtils
@@ -60,33 +62,6 @@ namespace ServiceUtils
         result.append(path.data(), path.size());
 #endif
         return result;
-    }
-
-
-    OrderService::OrderInfo OrderInfoFromJson(const nlohmann::json& jsonBody)
-    {
-
-        std::vector<std::string> required_fields
-        {
-            "productId", "amount", "emailClient", "price", "phoneNumber"
-        };
-
-        for (const auto& field : required_fields)
-        {
-            if (!jsonBody.contains(field))
-            {
-                throw std::runtime_error("Missing required field: " + field);
-            }
-        }
-
-        OrderService::OrderInfo order(
-            jsonBody["productId"].get<int64_t>(),
-            jsonBody["amount"].get<int32_t>(),
-            jsonBody["emailClient"].get<std::string>(),
-            jsonBody["price"].get<double>(),
-            jsonBody["phoneNumber"].get<std::string>()
-        );
-        return order;
     }
 
     bool isValidEmail(const std::string& email)

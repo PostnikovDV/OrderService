@@ -1,4 +1,5 @@
 #include "GetOrderHandler.h"
+#include "../Orders/OrderService.h"
 
 http::message_generator GetOrderHandler::HandlerGetOrder(http::request<http::string_body>& req, const int64_t orderId)
 {

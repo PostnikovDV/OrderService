@@ -1,21 +1,14 @@
 #pragma once
-#include <cstdlib>
-#include <fstream>
-#include <sstream>
+#include <regex>
+#include "../Handlers/CreateOrderHandler.h"
+#include "../Handlers/DeleteOrderHandler.h"
+#include "../Handlers/GetOrderHandler.h"
 #include "../Orders/OrderService.h"
-
-
-namespace beast = boost::beast;
-namespace http = beast::http;
-namespace net = boost::asio;
-using tcp = boost::asio::ip::tcp;
 
 namespace ServiceUtils
 {
     beast::string_view mime_type(beast::string_view path);
     std::string path_cat(beast::string_view base, beast::string_view path);
-
-    OrderService::OrderInfo OrderInfoFromJson(const nlohmann::json& jsonBody);
 
     bool isValidEmail(const std::string& email);
 
@@ -23,6 +16,8 @@ namespace ServiceUtils
     bool IsValidInternationalFormat(const std::string& phone);
     bool IsValidRussianFormat(const std::string& phone);
     bool IsValidSimpleFormat(const std::string& phone);
+
+    std::string GetConnectionStringFromEnv();
 
     template <class Body, class Allocator>
     http::message_generator HandleRequest(

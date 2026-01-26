@@ -1,11 +1,37 @@
 #include "CreateOrderHandler.h"
 
+OrderService::OrderInfo CreateOrderHandler::OrderInfoFromJson(const nlohmann::json& jsonBody)
+{
+
+    std::vector<std::string> required_fields
+    {
+        "productId", "amount", "emailClient", "price", "phoneNumber"
+    };
+
+    for (const auto& field : required_fields)
+    {
+        if (!jsonBody.contains(field))
+        {
+            throw std::runtime_error("Missing required field: " + field);
+        }
+    }
+
+    OrderService::OrderInfo order(
+        jsonBody["productId"].get<int64_t>(),
+        jsonBody["amount"].get<int32_t>(),
+        jsonBody["emailClient"].get<std::string>(),
+        jsonBody["price"].get<double>(),
+        jsonBody["phoneNumber"].get<std::string>()
+    );
+    return order;
+}
+
 http::message_generator CreateOrderHandler::HandleCreateOrder(http::request<http::string_body>& req)
 {
     try
     {
         const auto jsonBody = nlohmann::json::parse(req.body());
-        OrderService::OrderInfo orderData = ServiceUtils::OrderInfoFromJson(jsonBody);
+        OrderService::OrderInfo orderData = OrderInfoFromJson(jsonBody);
 
         int64_t orderId = m_orderService->CreateOrder(orderData);
 

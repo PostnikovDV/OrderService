@@ -1,11 +1,7 @@
 #include "Utils/ServiceUtils.h"
 #include "Orders/OrderService.h"
-#include "Handlers/CreateOrderHandler.h"
-#include "Handlers/GetOrderHandler.h"
-#include "Handlers/DeleteOrderHandler.h"
 #include "ServerUtils/HttpListener.h"
 #include "ServerUtils/HttpSession.h"
-#include <regex>
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -15,7 +11,7 @@ using tcp = boost::asio::ip::tcp;
 int main(int argc, char* argv[])
 {
     auto const threads = std::max<int>(1, std::thread::hardware_concurrency());
-    auto const address = net::ip::make_address("127.0.0.1");
+    auto const address = net::ip::make_address("0.0.0.0");
     auto const port = static_cast<unsigned short>(8181);
     std::filesystem::path exePath = std::filesystem::current_path();
     std::filesystem::path docRootPath = exePath / "www";
