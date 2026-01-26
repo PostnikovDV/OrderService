@@ -80,7 +80,6 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 
-# Ищем Kafka через pkg-config
 pkg_check_modules(CPPKAFKA cppkafka)
 pkg_check_modules(RDKAFKA rdkafka)
 
@@ -90,23 +89,19 @@ message(STATUS "RDKAFKA found: ${RDKAFKA_FOUND}")
 if(CPPKAFKA_FOUND AND RDKAFKA_FOUND)
     message(STATUS "Kafka libraries found, enabling Kafka support")
     
-    # 1. Добавляем include директории (для компилятора)
     target_include_directories(my_OrderService PRIVATE 
         ${CPPKAFKA_INCLUDE_DIRS}
     )
     
-    # 2. Добавляем пути к библиотекам (для линкера)
     target_link_directories(my_OrderService PRIVATE 
         ${CPPKAFKA_LIBRARY_DIRS}
     )
-    
-    # 3. Подключаем библиотеки по именам
+
     target_link_libraries(my_OrderService PRIVATE 
         cppkafka
         rdkafka
     )
-    
-    # 4. Ищем и копируем DLL (только на Windows)
+
     if(WIN32)
         find_file(CPPKAFKA_DLL
             NAMES cppkafka.dll
@@ -145,11 +140,10 @@ endif()
 
 
 
-# ДОБАВЬТЕ ОТЛАДКУ
+
 if(TARGET libpqxx::pqxx)
     message(STATUS "Target libpqxx::pqxx exists")
     
-    # Получим свойства цели
     get_target_property(PQXX_INCLUDES libpqxx::pqxx INTERFACE_INCLUDE_DIRECTORIES)
     message(STATUS "PQXX include directories: ${PQXX_INCLUDES}")
     
