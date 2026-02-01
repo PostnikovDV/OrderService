@@ -77,7 +77,7 @@ namespace ServiceUtils
         if (req.method() == http::verb::get)
         {
 
-            if (req.target().back() == '/')
+            if (req.target() == '/' || req.target() == "")
             {
                 std::string path = ServiceUtils::path_cat(doc_root, req.target());
                 path.append("index.html");
