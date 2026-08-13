@@ -8,7 +8,7 @@ private:
 
 public:
     GetOrderHandler(std::shared_ptr<OrderService> orderService)
-        : m_orderService(orderService) {}
+        : m_orderService(std::move(orderService)) {}
 
     http::message_generator HandlerGetOrder(http::request<http::string_body>& req, const int64_t orderId);
 };

@@ -22,7 +22,8 @@ namespace ServiceUtils
     template <class Body, class Allocator>
     http::message_generator HandleRequest(
         beast::string_view doc_root,
-        http::request<Body, http::basic_fields<Allocator>>&& req
+        http::request<Body, http::basic_fields<Allocator>>&& req,
+		std::shared_ptr<OrderService> orderService
     )
     {
         auto const bad_request =
@@ -61,8 +62,6 @@ namespace ServiceUtils
             return res;
         };
 
-        std::shared_ptr<OrderService> orderService = std::make_shared<OrderService>(ServiceUtils::GetConnectionStringFromEnv());
-
         if (req.method() != http::verb::get &&
             req.method() != http::verb::head &&
             req.method() != http::verb::post &&
@@ -77,7 +76,7 @@ namespace ServiceUtils
         if (req.method() == http::verb::get)
         {
 
-            if (req.target() == '/' || req.target() == "")
+            if (req.target() == "/" || req.target() == "")
             {
                 std::string path = ServiceUtils::path_cat(doc_root, req.target());
                 path.append("index.html");

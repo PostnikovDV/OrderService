@@ -10,30 +10,32 @@ using tcp = boost::asio::ip::tcp;
 
 int main(int argc, char* argv[])
 {
-    auto const threads = std::max<int>(1, std::thread::hardware_concurrency());
-    auto const address = net::ip::make_address("0.0.0.0");
-    auto const port = static_cast<unsigned short>(8181);
-    std::filesystem::path exePath = std::filesystem::current_path();
-    std::filesystem::path docRootPath = exePath / "www";
+	auto const threads = std::max<int>(1, std::thread::hardware_concurrency());
+	auto const address = net::ip::make_address("0.0.0.0");
+	auto const port = static_cast<unsigned short>(8181);
+	std::filesystem::path exePath = std::filesystem::current_path();
+	std::filesystem::path docRootPath = exePath / "www";
 
-    auto const docRoot = std::make_shared<std::string>(docRootPath.string());
+	const auto docRoot = docRootPath.string();
 
-    std::cout << "Server starting on " << address << ":" << port << " with " << threads << " threads." << std::endl;
+	std::cout << "Server starting on " << address << ":" << port << " with " << threads << " threads." << std::endl;
 
-    net::io_context ioc{ threads };
+	net::io_context ioc{ threads };
 
-    std::make_shared<HttpListener>(ioc, tcp::endpoint{ address, port }, docRoot)->run();
+	std::shared_ptr<OrderService> orderService_ = std::make_shared<OrderService>(ServiceUtils::GetConnectionStringFromEnv(), ioc);
 
-    std::vector<std::thread> v;
-    v.reserve(threads - 1);
-    for (auto i = threads - 1; i > 0; --i)
-        v.emplace_back([&ioc] { ioc.run(); });
+	std::make_shared<HttpListener>(ioc, tcp::endpoint{ address, port }, docRoot, orderService_)->run();
 
-    ioc.run();
+	std::vector<std::thread> v;
+	v.reserve(threads - 1);
+	for (auto i = threads - 1; i > 0; --i)
+		v.emplace_back([&ioc] { ioc.run(); });
 
-    for (auto& t : v)
-        t.join();
+	ioc.run();
 
-    std::cout << "Server stopped." << std::endl;
-    return 0;
+	for (auto& t : v)
+		t.join();
+
+	std::cout << "Server stopped." << std::endl;
+	return 0;
 }

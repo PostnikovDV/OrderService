@@ -7,10 +7,11 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
     beast::tcp_stream stream_;
     beast::flat_buffer buffer_;
     http::request<http::string_body> req_;
-    std::shared_ptr<std::string const> doc_root_;
+    std::string doc_root_;
+	std::shared_ptr<OrderService> orderService_;
 public:
-    HttpSession(tcp::socket&& socket, std::shared_ptr<std::string const> const& doc_root)
-        : stream_(std::move(socket)), doc_root_(doc_root)
+    HttpSession(tcp::socket&& socket, std::string doc_root, std::shared_ptr<OrderService> order_service)
+        : stream_(std::move(socket)), doc_root_(std::move(doc_root)), orderService_(std::move(order_service))
     {}
     void run()
     {
@@ -40,7 +41,7 @@ private:
         if (ec)
             return fail(ec, "read");
 
-        send_response(ServiceUtils::HandleRequest(*doc_root_, std::move(req_)));
+        send_response(ServiceUtils::HandleRequest(doc_root_, std::move(req_), orderService_));
     }
 
     void send_response(http::message_generator&& msg)

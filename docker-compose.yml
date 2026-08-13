@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  order_db:
+    container_name: order_db
+    image: postgres:15-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  order_app:
+    container_name: order_app
+    build: .
+    ports:
+      - '8181:8181'
+    environment:
+      DB_FULL_CONNECTION_STRING: "host=${DB_HOST} port=${DB_PORT} dbname=${POSTGRES_DB} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} sslmode=disable"
+    depends_on:
+      order_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  order_db_data:

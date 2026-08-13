@@ -1,0 +1,45 @@
+# .dockerignore
+
+# Build artifacts
+build/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.a
+*.lib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# Git
+.git/
+.gitignore
+
+# Temp files
+*.tmp
+*.temp
+*~
+__pycache__/
+
+# Binaries
+bin/
+dist/
+
+# Logs
+*.log
+logs/
+
+# Документация
+docs/
+*.md
+
+# Тестовые данные
+test/
+tests/
+*.test
