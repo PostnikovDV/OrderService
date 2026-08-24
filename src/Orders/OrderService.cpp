@@ -111,8 +111,8 @@ void OrderService::ProcessPayment(
 )
 {
 	payment_client_->ProcessPayment(
-		"payment-service",  // Хост (в Docker Compose)
-		"8081",             // Порт PaymentService
+		"payment_app",  // Хост (в Docker Compose)
+		"8282",             // Порт PaymentService
 		order_id,
 		amount,
 		session_id,

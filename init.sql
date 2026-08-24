@@ -11,9 +11,7 @@ CREATE TABLE IF NOT EXISTS orders (
 
 -- Индексы для быстрого поиска
 CREATE INDEX idx_orders_session_id ON orders(session_id);
-CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_orders_email_client ON orders(email_client);
-CREATE INDEX idx_orders_created_at ON orders(created_at);
 
 -- Комментарии к таблице и колонкам
 COMMENT ON TABLE orders IS 'Таблица заказов';

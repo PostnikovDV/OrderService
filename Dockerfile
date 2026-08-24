@@ -31,6 +31,7 @@ RUN vcpkg install \
     boost-asio:x64-linux \
     boost-beast:x64-linux \
     boost-system:x64-linux \
+    boost-uuid:x64-linux \
     nlohmann-json:x64-linux 
 
 

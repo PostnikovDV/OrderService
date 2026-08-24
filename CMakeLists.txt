@@ -77,7 +77,7 @@ target_precompile_headers(OrderService PRIVATE ${PCH_HEADER})
 
 # ===== BOOST =====
 # Для vcpkg используем find_package с CONFIG
-find_package(Boost CONFIG REQUIRED COMPONENTS system asio beast)
+find_package(Boost CONFIG REQUIRED COMPONENTS system asio beast uuid)
 if(Boost_FOUND)
     message(STATUS "Boost found: ${Boost_VERSION}")
 else()

@@ -48,9 +48,9 @@ public:
 
 		// Формируем JSON запрос
 		nlohmann::json payment_request = {
-			{"order_id", order_id},
+			{"orderId", order_id},
 			{"price", amount},
-			{"session_id", session_id}
+			{"sessionId", session_id}
 		};
 
 		// Формируем HTTP запрос

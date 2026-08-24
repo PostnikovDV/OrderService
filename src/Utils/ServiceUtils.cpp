@@ -111,7 +111,7 @@ namespace ServiceUtils
 
     std::string GetConnectionStringFromEnv()
     {
-        const char* fullConnectionString = std::getenv("DB_FULL_CONNECTION_STRING");
+        const char* fullConnectionString = std::getenv("DB_FULL_CONNECTION_STRING_ORDER");
         if (fullConnectionString)
         {
             return std::string(fullConnectionString);
@@ -131,13 +131,13 @@ namespace ServiceUtils
         std::string line;
         while (std::getline(file, line))
         {
-            if (line.find("DB_FULL_CONNECTION_STRING=") == 0)
+            if (line.find("DB_FULL_CONNECTION_STRING_ORDER=") == 0)
             {
                 return line.substr(26);
             }
         }
 
-        throw std::runtime_error("DB_FULL_CONNECTION_STRING not found in .env file");
+        throw std::runtime_error("DB_FULL_CONNECTION_STRING_ORDER not found in .env file");
     }
     
 } //ServiceUtils

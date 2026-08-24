@@ -7,14 +7,14 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER_ORDER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_ORDER}
+      POSTGRES_DB: ${POSTGRES_DB_ORDER}
     volumes:
       - order_db_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER_ORDER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,15 +22,51 @@ services:
 
   order_app:
     container_name: order_app
-    build: .
+    build:
+       context: .
+       dockerfile: Dockerfile
     ports:
       - '8181:8181'
     environment:
-      DB_FULL_CONNECTION_STRING: "host=${DB_HOST} port=${DB_PORT} dbname=${POSTGRES_DB} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} sslmode=disable"
+      DB_FULL_CONNECTION_STRING_ORDER: "host=${DB_HOST_ORDER} port=${DB_PORT_ORDER} dbname=${POSTGRES_DB_ORDER} user=${POSTGRES_USER_ORDER} password=${POSTGRES_PASSWORD_ORDER} sslmode=disable"
     depends_on:
       order_db:
         condition: service_healthy
     restart: unless-stopped
 
+  payment_app:
+    container_name: payment_app
+    build: 
+      context: ../PayMentService
+      dockerfile: Dockerfile
+    ports:
+      - '8282:8282'
+    environment:
+      DB_FULL_CONNECTION_STRING_PAYMENT: "host=${DB_HOST_PAYMENT} port=${DB_PORT_PAYMENT} dbname=${POSTGRES_DB_PAYMENT} user=${POSTGRES_USER_PAYMENT} password=${POSTGRES_PASSWORD_PAYMENT} sslmode=disable"
+    depends_on:
+      payment_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  payment_db:
+    container_name: payment_db
+    image: postgres:15-alpine
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_PAYMENT}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_PAYMENT}
+      POSTGRES_DB: ${POSTGRES_DB_PAYMENT}
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+      - ../PayMentService/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER_PAYMENT}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
 volumes:
   order_db_data:
+  payment_db_data:
