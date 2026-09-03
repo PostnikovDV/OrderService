@@ -2,6 +2,8 @@
 
 #include "../Clients/PaymentClient.h"
 
+#include "../Kafka/KafkaProducer.h"
+
 #include "../Utils/ServiceUtils.h"
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -11,6 +13,7 @@ OrderService::OrderService(const std::string& dbConnection, net::io_context& ioc
 	m_dbConnection(dbConnection)
 	, ioc_(ioc)
 	, payment_client_(std::make_shared<PaymentClient>(ioc))
+	, kafka_producer_(std::make_shared<KafkaProducer>("kafka1:9093"))
 {}
 
 int64_t OrderService::CreateOrder(const OrderInfo& orderRequest)
@@ -31,7 +34,12 @@ int64_t OrderService::CreateOrder(const OrderInfo& orderRequest)
 	{
 		throw std::invalid_argument("Invalid Phone Number");
 	}
-	return InsertOrderToDB(orderRequest);
+
+	const auto orderId = InsertOrderToDB(orderRequest);
+
+	SendOrderCreatedEvent(orderId, orderRequest);
+
+	return orderId;
 }
 
 OrderService::OrderInfo OrderService::GetOrder(int64_t order_id)
@@ -131,4 +139,26 @@ void OrderService::ProcessPayment(
 			}
 		}
 	);
+}
+
+void OrderService::SendOrderCreatedEvent(int64_t order_id, const OrderInfo& order)
+{
+	nlohmann::json event
+	{
+		{"type", "order_created"},
+		{"order_id", order_id},
+		{"session_id", order.GetSessionId()},
+		{"total_price", order.GetPrice() * order.GetAmount()},
+		{"user_id", order.GetEmailClient()},
+		{"timestamp", std::time(nullptr)}
+	};
+
+	if (kafka_producer_)
+	{
+		kafka_producer_->SendMessageKafka("order_notifications", event);
+	}
+	else
+	{
+		std::cerr << "⚠️ kafka_producer_ is null!" << std::endl;
+	}
 }

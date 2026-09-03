@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     tar \
+	librdkafka-dev \
     zip \
     unzip \
     autoconf \
@@ -32,7 +33,7 @@ RUN vcpkg install \
     boost-beast:x64-linux \
     boost-system:x64-linux \
     boost-uuid:x64-linux \
-    nlohmann-json:x64-linux 
+    nlohmann-json:x64-linux
 
 
 # Установка libpqxx через apt
@@ -76,6 +77,7 @@ RUN apt-get update && apt-get install -y \
     libssl3 \
     zlib1g \
     ca-certificates \
+    librdkafka-dev \
     libpqxx-6.4 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -85,9 +87,12 @@ RUN ldconfig
 
 WORKDIR /app
 
-# Копируем собранное приложение (исправляем имя)
+# ✅ Копируем бинарник
 COPY --from=builder /app/build/OrderService /app/OrderService
 
+# ✅ Копируем исходники (для отладки в VS Code)
+COPY --from=builder /app/src /app/src
+COPY --from=builder /app/CMakeLists.txt /app/CMakeLists.txt
 
 EXPOSE 8181
 

@@ -29,6 +29,8 @@ set(SOURCE_FILES
     src/ServerUtils/HttpSession.h
     src/Clients/PaymentClient.cpp
     src/Clients/PaymentClient.h
+    src/Kafka/KafkaProducer.cpp
+    src/Kafka/KafkaProducer.h
 )
 
 # Проверяем существование файлов
@@ -71,6 +73,11 @@ source_group("Clients" FILES
     src/Clients/PaymentClient.h
 )
 
+source_group("Kafka" FILES 
+    src/Kafka/KafkaProducer.cpp
+    src/Kafka/KafkaProducer.h
+)
+
 source_group("PCH" FILES ${PCH_HEADER})
 
 target_precompile_headers(OrderService PRIVATE ${PCH_HEADER})
@@ -102,42 +109,15 @@ else()
 endif()
 
 # ===== Kafka (опционально) =====
-# Используем find_package вместо pkg-config на Windows
-find_package(cppkafka CONFIG QUIET)
-find_package(rdkafka CONFIG QUIET)
+find_library(RDKAFKA_LIB rdkafka)
+find_library(RDKAFKA_CPP_LIB rdkafka++)
 
-if(TARGET cppkafka AND TARGET rdkafka)
-    message(STATUS "Kafka libraries found, enabling Kafka support")
-    target_link_libraries(OrderService PRIVATE cppkafka rdkafka)
-    
-    # Копирование DLL на Windows
-    if(WIN32)
-        # Находим DLL через vcpkg
-        find_file(CPPKAFKA_DLL
-            NAMES cppkafka.dll
-            PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../../vcpkg/vcpkg/installed/x64-windows/bin
-            NO_DEFAULT_PATH
-        )
-        find_file(RDKAFKA_DLL
-            NAMES rdkafka.dll
-            PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../../vcpkg/vcpkg/installed/x64-windows/bin
-            NO_DEFAULT_PATH
-        )
-        
-        if(CPPKAFKA_DLL AND RDKAFKA_DLL)
-            message(STATUS "Found Kafka DLLs, will copy to output directory")
-            add_custom_command(TARGET OrderService POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${CPPKAFKA_DLL}" "$<TARGET_FILE_DIR:OrderService>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${RDKAFKA_DLL}" "$<TARGET_FILE_DIR:OrderService>"
-                COMMENT "Copying Kafka DLLs"
-            )
-        endif()
-    endif()
+if(RDKAFKA_LIB AND RDKAFKA_CPP_LIB)
+    message(STATUS "✅ librdkafka found!")
+    set(HAVE_KAFKA ON)
 else()
-    message(WARNING "Kafka not found, building without Kafka support")
-    target_compile_definitions(OrderService PRIVATE NO_KAFKA_SUPPORT)
+    message(WARNING "⚠️ librdkafka not found! Kafka support disabled.")
+    set(HAVE_KAFKA OFF)
 endif()
 
 # ===== Линковка =====
@@ -148,5 +128,13 @@ target_link_libraries(OrderService PRIVATE
     ${PQXX_LIBRARY}
     nlohmann_json::nlohmann_json
 )
+
+if(HAVE_KAFKA)
+    target_link_libraries(OrderService PRIVATE
+        ${RDKAFKA_CPP_LIB}
+        ${RDKAFKA_LIB}
+    )
+    target_compile_definitions(OrderService PRIVATE HAVE_KAFKA)
+endif()
 
 message(STATUS "Build configuration complete!")

@@ -19,7 +19,7 @@ using tcp = boost::asio::ip::tcp;
 struct PaymentResponse
 {
 	bool success;
-	std::string payment_id;
+	int64_t payment_id;
 	std::string error_message;
 	int http_status;
 };
@@ -44,6 +44,12 @@ public:
 		Callback callback
 	)
 	{
+
+		buffer_.clear();
+
+		req_ = {};
+		res_ = {};
+
 		callback_ = std::move(callback);
 
 		// Формируем JSON запрос
@@ -169,7 +175,7 @@ private:
 				if (json.contains("payment_id"))
 				{
 					response.success = true;
-					response.payment_id = json["payment_id"].get<std::string>();
+					response.payment_id = json["payment_id"].get<std::int64_t>();
 				}
 				else
 				{
@@ -183,7 +189,8 @@ private:
 				response.error_message = json.value("error", "Unknown error");
 			}
 		}
-		catch (const std::exception& e) {
+		catch (const std::exception& e)
+		{
 			response.success = false;
 			response.error_message = "Parse error: " + std::string(e.what());
 		}

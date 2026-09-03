@@ -6,6 +6,8 @@ namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
 
 class PaymentClient;
+class KafkaProducer;
+
 class OrderService
 {
 public:
@@ -60,8 +62,10 @@ public:
 private:
 	int64_t InsertOrderToDB(const OrderInfo& request);
 	OrderInfo GetOrderFromDb(int64_t orderId);
+	void SendOrderCreatedEvent(int64_t order_id, const OrderInfo& order);
 private:
 	std::shared_ptr<PaymentClient> payment_client_;
 	net::io_context& ioc_;
 	pqxx::connection m_dbConnection;
+	std::shared_ptr<KafkaProducer> kafka_producer_;
 };
