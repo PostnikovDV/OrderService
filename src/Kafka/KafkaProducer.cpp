@@ -52,7 +52,7 @@ bool KafkaProducer::SendMessageKafka(const std::string& topic, const std::string
 {
 	if (!producer)
 	{
-		std::cerr << "❌ Kafka producer is null!" << std::endl;
+		std::cerr << "Kafka producer is null!" << std::endl;
 		return false;
 	}
 
@@ -79,18 +79,18 @@ bool KafkaProducer::SendMessageKafka(const std::string& topic, const std::string
 		}
 
 		producer->poll(0);
-		std::cout << "✅ Message sent to " << topic << std::endl;
+		std::cout << "Message sent to " << topic << std::endl;
 		return true;
 
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << "❌ Kafka exception: " << e.what() << std::endl;
+		std::cerr << "Kafka exception: " << e.what() << std::endl;
 		return false;
 	}
 	catch (...)
 	{
-		std::cerr << "❌ Kafka unknown exception!" << std::endl;
+		std::cerr << "Kafka unknown exception!" << std::endl;
 		return false;
 	}
 }

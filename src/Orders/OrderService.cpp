@@ -159,6 +159,6 @@ void OrderService::SendOrderCreatedEvent(int64_t order_id, const OrderInfo& orde
 	}
 	else
 	{
-		std::cerr << "⚠️ kafka_producer_ is null!" << std::endl;
+		std::cerr << "kafka_producer_ is null!" << std::endl;
 	}
 }
